@@ -20,9 +20,6 @@ You can also download it manually and place it inside the folder.
 **Download Link:**
 - [BLIP-Large](https://storage.googleapis.com/sfr-vision-language-research/BLIP/models/model_large_caption.pth)
 
-> ⚠️ Make sure the file is saved under:  
-> `./checkpoints/model_large_caption.pth`
-
 ---
 
 ## 🧩 Folder Structure
@@ -36,3 +33,4 @@ AutoCaption/
  │    └── ...
  ├── inference.py
  └── README.md
+
