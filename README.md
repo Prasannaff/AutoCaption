@@ -1,54 +1,38 @@
-# Image Captioning
+# 🖼️ AutoCaption — Image Captioning using BLIP
 
-Captioning is an img2txt model that uses the BLIP. Exports captions of images.
+AutoCaption is an **image-to-text (img2txt)** model that automatically generates **descriptive captions** for images using the **BLIP (Bootstrapped Language Image Pretraining)** model.
 
-## Checkpoints [Required]
+---
 
-If there is no 'Checkpoints' folder, the script will automatically create the folder and download the model file, you can do this manually if you want.
+## 🚀 Features
+- Generates natural language captions from input images.
+- Supports **batch processing** for multiple images at once.
+- Automatically downloads the pretrained **BLIP-Large** model if not available.
+- GPU acceleration supported for faster inference.
 
-Download the fine-tuned checkpoint and copy into 'checkpoints' folder (create if does not exists)
+---
 
+## 📦 Model Checkpoints (Required)
+
+If there is no `checkpoints` folder, the script will automatically create one and download the model file.  
+You can also download it manually and place it inside the folder.
+
+**Download Link:**
 - [BLIP-Large](https://storage.googleapis.com/sfr-vision-language-research/BLIP/models/model_large_caption.pth)
 
-## Demo
+> ⚠️ Make sure the file is saved under:  
+> `./checkpoints/model_large_caption.pth`
 
-<img src='./demo.jpg' width=500px>
+---
 
-```txt
-Captions--
-  |-0_captions.txt
-  |-1_captions.txt
-  |-2_captions.txt
-  |-3_captions.txt
-  |-4_captions.txt
-```
-
-## Usage
-
+## 🧩 Folder Structure
 ```bash
-usage: inference.py [-h] [-i INPUT] [-b BATCH] [-p PATHS] [-g GPU_ID]        
-
-Image caption CLI
-
-optional arguments:
-  -h, --help                      show this help message and exit
-  -i INPUT,  --input INPUT        Input directoryt path, such as ./images
-  -b BATCH,  --batch BATCH        Batch size
-  -p PATHS,  --paths PATHS        A any.txt files contains all image paths.
-  -g GPU_ID, --gpu-id GPU_ID      gpu device to use (default=0) can be 0,1,2 for multi-gpu
-```
-
-### Example
-
-```bash
-python inference.py -i /path/images/folder --batch 8 --gpu 0
-```
-
-## Contributing
-
-Pull requests are welcome. For major changes, please open an issue first
-to discuss what you would like to change.
-
-Please make sure to update tests as appropriate.
-
-
+AutoCaption/
+ ├── checkpoints/
+ ├── images/
+ ├── captions/
+ │    ├── 0_captions.txt
+ │    ├── 1_captions.txt
+ │    └── ...
+ ├── inference.py
+ └── README.md
