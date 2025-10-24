@@ -15,24 +15,12 @@ Download the fine-tuned checkpoint and copy into 'checkpoints' folder (create if
 <img src='./demo.jpg' width=500px>
 
 ```txt
-datasets\0.jpg, a piece of cheese with figs and a piece of cheese
-datasets\1002.jpg, a close up of a yellow flower with a green background
-datasets\1005.jpg, a planter filled with lots of colorful flowers
-datasets\1008.jpg, a teacher standing in front of a classroom full of children
-datasets\1011.jpg, a tortoise on a white background with a white background
-datasets\1014.jpg, a glass of wine sitting on top of a table
-datasets\1017.jpg, a close up of a plant with pink flowers
-datasets\102.jpg, a platter of different types of sushi
-datasets\1020.jpg, a frog sitting on top of a bamboo stick
-datasets\1023.jpg, a revolver on a white background
-datasets\1026.jpg, a woman holding a small white dog in her arms
-datasets\1029.jpg, a woman in a business suit standing in front of a building
-datasets\1032.jpg, sliced cucumber on a white background
-datasets\1035.jpg, a woman in glasses and a pair of boxing gloves
-datasets\1038.jpg, a pile of sliced potatoes on a white surface
-datasets\1041.jpg, two glasses of orange juice on a wooden table
-datasets\1044.jpg, a woman sitting on the floor in front of a door
-
+Captions--
+  |-0_captions.txt
+  |-1_captions.txt
+  |-2_captions.txt
+  |-3_captions.txt
+  |-4_captions.txt
 ```
 
 ## Usage
@@ -63,6 +51,4 @@ to discuss what you would like to change.
 
 Please make sure to update tests as appropriate.
 
-## License
 
-[MIT](https://choosealicense.com/licenses/mit/)
