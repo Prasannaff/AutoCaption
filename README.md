@@ -1,36 +1,78 @@
-# 🖼️ AutoCaption — Image Captioning using BLIP
+# AutoCaption – Social Media Caption Generator
 
-AutoCaption is an **image-to-text (img2txt)** model that automatically generates **descriptive captions** for images using the **BLIP (Bootstrapped Language Image Pretraining)** model.
+<img src="./ui_preview.png" width="100%">
+
+AutoCaption is a **real-world AI powered Social Media Caption Generator** built using **BLIP Vision-Language Model**.  
+It converts any image into a ready-to-post, social-platform-optimized caption with intelligent hashtag suggestions.
+
+This tool is designed for modern digital content workflows — creators, ecommerce product owners, marketing teams, agencies, meme pages, photographers, advertisers and influencers.
+
+### Why this project matters?
+
+Every single major platform today is image-first:
+
+- Instagram  
+- Facebook  
+- Twitter (X)  
+- Pinterest  
+- LinkedIn  
+
+Yet – writing captions and finding relevant hashtags is still a manual effort and wastes time.
+
+AutoCaption solves this by auto-generating:
+
+- 1 unique well-structured caption per image
+- Tone control (Neutral / Fun / Luxury)
+- Platform friendly hashtags (10+ curated tags)
+- Multi-image processing at once
+
+This makes AutoCaption directly usable in the **real world**.
 
 ---
 
-## 🚀 Features
-- Generates natural language captions from input images.
-- Supports **batch processing** for multiple images at once.
-- Automatically downloads the pretrained **BLIP-Large** model if not available.
-- GPU acceleration supported for faster inference.
+## Key Features
+
+| Feature | Description |
+|--------|-------------|
+| AI Image Captioning | Uses BLIP Vision-Language AI model to generate context aware captions |
+| Platform Optimized | Captions suitable for insta reels, product photos, artworks, photography posts, travel shots |
+| Hashtag Auto Generation | Generates keyword based trendy hashtags |
+| Multi Upload Support | Upload multiple images and get multiple social caption rows instantly |
+| Social Tone | Neutral / Fun / Luxury styles |
+| Gradio UI | Clean, fast, responsive UI for demo / deployment |
 
 ---
 
-## 📦 Model Checkpoints (Required)
+## Tech Stack
 
-If there is no `checkpoints` folder, the script will automatically create one and download the model file.  
-You can also download it manually and place it inside the folder.
-
-**Download Link:**
-- [BLIP-Large](https://storage.googleapis.com/sfr-vision-language-research/BLIP/models/model_large_caption.pth)
+| Component | Technology |
+|----------|------------|
+| Model | BLIP Base Vision Language Model |
+| Backend | Python + PyTorch |
+| Preprocessing | torchvision |
+| Frontend UI | Gradio |
+| Environment | Local / Cloud / HF Spaces |
 
 ---
 
-## 🧩 Folder Structure
+## Output Format Example
+
+| filename | caption | hashtags |
+|---------|---------|----------|
+| image_09.png | A statue of an angel holding a bird. | #statue #angel #bird #photography #instagood ... |
+
+---
+
+## Demo Preview
+
+<img src="./ui_preview.png" width="100%">
+
+---
+
+## Installation & Setup
+
 ```bash
-AutoCaption/
- ├── checkpoints/
- ├── images/
- ├── captions/
- │    ├── 0_captions.txt
- │    ├── 1_captions.txt
- │    └── ...
- ├── inference.py
- └── README.md
-
+git clone https://github.com/Prasannaff/AutoCaption
+cd AutoCaption
+pip install -r requirements.txt
+python inference.py
