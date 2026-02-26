@@ -1,9 +1,10 @@
 # =======================
-# AutoCaption · Social Media Caption Generator
+# AutoCaption · Social Media Caption Generator (Multilingual + Speech)
 # =======================
+
 import os
-from typing import List
 import random
+from typing import List
 
 import torch
 import gradio as gr
@@ -16,20 +17,26 @@ from utils import (
     BLIP_CKPT_URL
 )
 
+# ✅ Import both translation + speech
+from translator import translate_batch, text_to_speech
+
 MED_CFG_PATH = "configs/med_config.json"
 
 
 # ---------- BLIP loader ----------
 def load_blip_decoder(med_config, image_size, vit, checkpoint, device):
     from models.blip import BLIP_Decoder
+
     model = BLIP_Decoder(
         med_config=med_config,
         image_size=image_size,
         vit=vit
     )
+
     ckpt = torch.load(checkpoint, map_location="cpu")
     state = ckpt.get("model", ckpt)
     model.load_state_dict(state, strict=False)
+
     return model.to(device)
 
 
@@ -46,19 +53,22 @@ def load_model(device):
 @torch.no_grad()
 def caption_batch(images, model, device, beams, max_len):
     batch = preprocess_batch(images, device)
-    out = model.generate(
+
+    outputs = model.generate(
         batch,
         sample=False,
         num_beams=beams,
         max_length=max_len,
         min_length=5,
     )
-    return [c.strip().rstrip(".") for c in out]
+
+    return [c.strip().rstrip(".") for c in outputs]
 
 
 # ---------- Context-aware creative logic ----------
 def detect_context(caption: str):
     c = caption.lower()
+
     if any(w in c for w in ["blood", "knife", "sword", "weapon", "gun"]):
         return "dark"
     if any(w in c for w in ["car", "watch", "luxury", "building", "city"]):
@@ -67,6 +77,7 @@ def detect_context(caption: str):
         return "portrait"
     if any(w in c for w in ["tree", "sky", "mountain", "nature"]):
         return "nature"
+
     return "general"
 
 
@@ -91,7 +102,7 @@ FUNNY_MAP = {
 
 LUXURY_MAP = {
     "dark": [
-        "{c}. Power. Control. Presence.",
+        "{c}. Power. Control. Presence."
     ],
     "luxury": [
         "{c}. Quiet luxury in focus.",
@@ -110,16 +121,21 @@ LUXURY_MAP = {
 
 def style_caption(base, tone, creative):
     base = base[:1].upper() + base[1:]
+
     if not creative or tone == "Neutral":
         return base + "."
 
     context = detect_context(base)
 
     if tone == "Fun":
-        return random.choice(FUNNY_MAP.get(context, FUNNY_MAP["general"])).format(c=base)
+        return random.choice(
+            FUNNY_MAP.get(context, FUNNY_MAP["general"])
+        ).format(c=base)
 
     if tone == "Luxury":
-        return random.choice(LUXURY_MAP.get(context, LUXURY_MAP["general"])).format(c=base)
+        return random.choice(
+            LUXURY_MAP.get(context, LUXURY_MAP["general"])
+        ).format(c=base)
 
     return base + "."
 
@@ -130,18 +146,22 @@ def hashtags_from_caption(caption):
         for w in caption.split()
         if w.isalpha() and len(w) > 3
     ]
+
     base = words[:5] + ["photography", "instadaily", "explore"]
+
     tags = []
     for w in base:
         tag = f"#{w}"
         if tag not in tags:
             tags.append(tag)
+
     return " ".join(tags)
 
 
 # ---------- HTML Results ----------
 def render_results(names, captions, hashtags):
     rows = ""
+
     for n, c, h in zip(names, captions, hashtags):
         rows += f"""
         <tr>
@@ -202,27 +222,39 @@ def render_results(names, captions, hashtags):
 
 
 # ---------- Pipeline ----------
-def run_social(files, tone, beams, maxlen, creative, device, model):
+def run_social(files, tone, beams, maxlen, creative, language, device, model):
+
     images, names = [], []
+
     for f in files:
         img = Image.open(f.name).convert("RGB")
         images.append(img)
         names.append(os.path.basename(f.name))
 
     base_caps = caption_batch(images, model, device, beams, maxlen)
-    final_caps = [style_caption(c, tone, creative) for c in base_caps]
-    tags = [hashtags_from_caption(c) for c in base_caps]
 
-    return images, render_results(names, final_caps, tags)
+    styled_caps = [style_caption(c, tone, creative) for c in base_caps]
+
+    # ✅ Translate
+    final_caps = translate_batch(styled_caps, language)
+
+    # ✅ Generate speech for FIRST caption
+    audio_file = text_to_speech(final_caps[0], language)
+
+    tags = [hashtags_from_caption(c) for c in final_caps]
+
+    return images, render_results(names, final_caps, tags), audio_file
 
 
 # ---------- UI ----------
 def build_app():
+
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     model = load_model(device)
 
     with gr.Blocks(title="AutoCaption Social") as demo:
-        gr.Markdown("## AutoCaption · Social Media Caption Generator")
+
+        gr.Markdown("## AutoCaption · Social Media Caption Generator 🌍🔊")
 
         files = gr.Files(file_types=["image"], label="Upload images")
 
@@ -237,17 +269,37 @@ def build_app():
             tone = gr.Radio(["Neutral", "Fun", "Luxury"], value="Fun")
             creative = gr.Checkbox(label="Creative mode (context-aware)")
 
+        language = gr.Dropdown(
+            [
+                "English",
+                "Hindi",
+                "Kannada",
+                "Tamil",
+                "Telugu",
+                "Spanish",
+                "French",
+                "German"
+            ],
+            value="English",
+            label="Caption Language"
+        )
+
         with gr.Row():
             beams = gr.Slider(1, 5, value=3, label="Beam search")
             maxlen = gr.Slider(10, 40, value=30, label="Max length")
 
         btn = gr.Button("Generate")
+
         result = gr.HTML(label="Results")
 
+        audio_player = gr.Audio(label="🔊 Listen Caption")
+
         btn.click(
-            fn=lambda f, t, b, m, c: run_social(f, t, b, m, c, device, model),
-            inputs=[files, tone, beams, maxlen, creative],
-            outputs=[preview, result]
+            fn=lambda f, t, b, m, c, l: run_social(
+                f, t, b, m, c, l, device, model
+            ),
+            inputs=[files, tone, beams, maxlen, creative, language],
+            outputs=[preview, result, audio_player]
         )
 
     return demo
